@@ -1,14 +1,3 @@
-# TripMind ✈️ — AI Trip Planner (modular backend)
-
-Describe a trip in plain English — *"somewhere warm in December, under ₹30,000,
-5 days, from Delhi"* — and TripMind picks a destination, a flight and a hotel
-within budget, builds a day-by-day itinerary, and saves it to **My Trips**.
-
-This is your original modular `app/` architecture, **completed and fixed** so it
-runs with one command and no errors.
-
----
-
 # ✈️ TripMind — AI-Powered Trip Planner
 
 > **Describe your perfect trip in natural language. TripMind turns it into a complete, budget-aware travel plan.**
