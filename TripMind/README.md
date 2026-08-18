@@ -13,6 +13,7 @@ TripMind analyzes the request, recommends a suitable destination, selects a flig
 The application combines a **deterministic AI planning engine**, natural-language parsing, fuzzy destination matching, budget optimization, JWT authentication, PDF itinerary generation, and interactive maps into a single modular platform.
 
 ---
+http://127.0.0.1:8000/login.html
 
 ## 🌍 Why TripMind?
 
