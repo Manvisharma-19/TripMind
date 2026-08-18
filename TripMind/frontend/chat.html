@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Plan a trip - TripMind</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="navbar">
+    <a href="chat.html" class="brand">TripMind</a>
+    <nav>
+      <a href="chat.html" class="active">Plan a trip</a>
+      <a href="trips.html">My trips</a>
+      <a href="settings.html">Settings</a>
+      <button id="logoutBtn">Log out</button>
+    </nav>
+  </header>
+
+  <main class="chat-wrap">
+    <div class="messages" id="messages"></div>
+
+    <div class="starters" id="starters">
+      <p>Try asking</p>
+      <button class="starter-btn" data-msg="Somewhere warm in December, under Rs 30,000, 5 days, from Delhi">Somewhere warm in December, under Rs 30,000, 5 days, from Delhi</button>
+      <button class="starter-btn" data-msg="A heritage trip to Ahmedabad, 4 nights, from Mumbai">A heritage trip to Ahmedabad, 4 nights, from Mumbai</button>
+      <button class="starter-btn" data-msg="Snowy mountains from Delhi, 6 days, budget 35000">Snowy mountains from Delhi, 6 days, budget 35000</button>
+    </div>
+
+    <form class="chat-form" id="chatForm">
+      <textarea id="messageInput" rows="1" placeholder="Describe the trip you want..."></textarea>
+      <button type="submit" id="sendBtn">Send</button>
+    </form>
+  </main>
+
+  <script src="api.js"></script>
+  <script>
+    requireAuth();
+    let conversationId = null, loading = false;
+    const messagesEl = document.getElementById("messages");
+    const startersEl = document.getElementById("starters");
+    const form = document.getElementById("chatForm");
+    const input = document.getElementById("messageInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    document.getElementById("logoutBtn").addEventListener("click", function () {
+      clearToken(); window.location.href = "login.html";
+    });
+
+    const inr = function (n) { return "\u20B9" + Number(n).toLocaleString("en-IN"); };
+
+    function addBubble(role, content) {
+      const row = document.createElement("div");
+      row.className = "bubble-row " + role;
+      const b = document.createElement("div");
+      b.className = "bubble " + role; b.textContent = content;
+      row.appendChild(b); messagesEl.appendChild(row);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function mapUrl(lat, lon) {
+      var d = 0.15;
+      return "https://www.openstreetmap.org/export/embed.html?bbox=" +
+        (lon-d)+"%2C"+(lat-d)+"%2C"+(lon+d)+"%2C"+(lat+d)+"&layer=mapnik&marker="+lat+"%2C"+lon;
+    }
+
+    function downloadPdf(id, btn) {
+      var old = btn.textContent; btn.disabled = true; btn.textContent = "…";
+      fetch(API_URL + "/bookings/" + id + "/pdf", { headers: { Authorization: "Bearer " + getToken() } })
+        .then(function (r) { if (!r.ok) throw new Error("PDF failed"); return r.blob(); })
+        .then(function (blob) {
+          var u = URL.createObjectURL(blob), a = document.createElement("a");
+          a.href = u; a.download = "tripmind_trip_" + id + ".pdf";
+          document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(u);
+        })
+        .catch(function (e) { alert(e.message); })
+        .finally(function () { btn.disabled = false; btn.textContent = old; });
+    }
+
+    // Rich plan card in the chat
+    function addPlanCard(it, bookingId) {
+      const uid = "m" + Date.now() + Math.floor(Math.random() * 999);
+      const days = (it.days || []).map(function (d, i) {
+        return "<li><span>Day " + (i + 1) + "</span>" + d + "</li>"; }).join("");
+      const alts = (it.alternatives || []).map(function (a) {
+        return "<span class='alt-chip'>" + a.city + " · " + inr(a.total) + "</span>"; }).join("");
+      const badge = it.is_update ? "<span class='plan-badge'>Updated</span>" : "";
+      const over = it.within_budget ? "" : " <span class='over'>(over budget)</span>";
+
+      const html =
+        "<div class='plan-card'>" +
+          "<div class='plan-head'>" +
+            "<div class='route'><b>" + it.origin + "</b> <span class='pl'>\u2708</span> <b>" + it.destination + "</b></div>" +
+            "<div class='pn'>" + it.nights + " nights " + badge + "</div>" +
+          "</div>" +
+          (it.highlight ? "<p class='plan-hl'>" + it.highlight + "</p>" : "") +
+          "<div class='prow'><span class='pk'>\u2708\ufe0f Flight</span><span class='pv'>" + it.airline + " · " + it.departure_date + "</span><span class='pp'>" + inr(it.flight_price) + "</span></div>" +
+          "<div class='prow'><span class='pk'>\U0001f3e8 Hotel</span><span class='pv'>" + it.hotel_name + " · \u2605" + it.hotel_rating + "</span><span class='pp'>" + inr(it.hotel_price_per_night) + "/night</span></div>" +
+          "<div class='prow total'><span class='pk'>\U0001f4b0 Total</span><span class='pv'></span><span class='pp'>" + inr(it.total_price) + over + "</span></div>" +
+          "<details class='plan-days'><summary>Day-by-day itinerary</summary><ul class='day-list'>" + days + "</ul></details>" +
+          (alts ? "<div class='plan-alts'>Also considered: " + alts + "</div>" : "") +
+          "<div class='plan-actions'>" +
+            (bookingId ? "<button class='chip-btn' id='pdf-" + uid + "'>\u2b07 Download PDF</button>" : "") +
+            (it.lat != null ? "<button class='chip-btn' id='map-" + uid + "'>\u25ce Show map</button>" : "") +
+          "</div>" +
+          (it.lat != null ? "<div class='plan-map' id='mapwrap-" + uid + "' style='display:none'><iframe title='map' loading='lazy' src='" + mapUrl(it.lat, it.lon) + "'></iframe></div>" : "") +
+        "</div>";
+
+      const row = document.createElement("div");
+      row.className = "bubble-row assistant";
+      row.innerHTML = html;
+      messagesEl.appendChild(row);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+
+      if (bookingId) {
+        const pb = document.getElementById("pdf-" + uid);
+        pb.addEventListener("click", function () { downloadPdf(bookingId, pb); });
+      }
+      if (it.lat != null) {
+        document.getElementById("map-" + uid).addEventListener("click", function () {
+          const m = document.getElementById("mapwrap-" + uid);
+          m.style.display = m.style.display === "none" ? "block" : "none";
+          messagesEl.scrollTop = messagesEl.scrollHeight;
+        });
+      }
+    }
+
+    function setThinking(show) {
+      const ex = document.getElementById("thinkingRow");
+      if (ex) ex.remove();
+      if (!show) return;
+      const row = document.createElement("div");
+      row.className = "bubble-row assistant"; row.id = "thinkingRow";
+      row.innerHTML = '<div class="thinking"><div class="track"><div class="plane"></div></div><span>Planning...</span></div>';
+      messagesEl.appendChild(row); messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    async function sendMessage(text) {
+      if (!text.trim() || loading) return;
+      startersEl.style.display = "none";
+      addBubble("user", text); input.value = "";
+      loading = true; sendBtn.disabled = true; setThinking(true);
+      try {
+        const res = await api.sendMessage(text, conversationId);
+        conversationId = res.conversation_id;
+        setThinking(false);
+        if (res.itinerary) addPlanCard(res.itinerary, res.booking_id);
+        else addBubble("assistant", res.reply);
+      } catch (err) {
+        setThinking(false);
+        addBubble("assistant", "Something went wrong reaching the planner: " + err.message);
+      } finally { loading = false; sendBtn.disabled = false; }
+    }
+
+    addBubble("assistant", "Tell me what kind of trip you're after — a vibe, a budget, roughly how long, and where you're flying from. I'll plan it, and you can refine with things like \u201cmake it cheaper\u201d.");
+
+    document.querySelectorAll(".starter-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () { sendMessage(btn.getAttribute("data-msg")); });
+    });
+    form.addEventListener("submit", function (e) { e.preventDefault(); sendMessage(input.value); });
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(input.value); }
+    });
+  </script>
+</body>
+</html>

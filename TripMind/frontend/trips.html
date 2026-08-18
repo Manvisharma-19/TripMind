@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My trips — TripMind</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="navbar">
+    <a href="chat.html" class="brand">TripMind</a>
+    <nav>
+      <a href="chat.html">Plan a trip</a>
+      <a href="trips.html" class="active">My trips</a>
+      <a href="settings.html">Settings</a>
+      <button id="logoutBtn">Log out</button>
+    </nav>
+  </header>
+
+  <main class="trips-wrap">
+    <h1 class="display">My trips</h1>
+    <p class="subtitle">Everything TripMind has planned for you.</p>
+
+    <div id="statsBar" class="stats-bar" style="display:none"></div>
+    <div id="content"><p class="loading-text">Loading...</p></div>
+  </main>
+
+  <script src="api.js"></script>
+  <script>
+    requireAuth();
+    document.getElementById("logoutBtn").addEventListener("click", function () {
+      clearToken(); window.location.href = "login.html";
+    });
+
+    const contentEl = document.getElementById("content");
+    const statsBar = document.getElementById("statsBar");
+    const inr = function (n) { return "\u20B9" + Number(n).toLocaleString("en-IN"); };
+
+    function statTile(v, l) {
+      return '<div class="stat-tile"><div class="stat-value">' + v +
+             '</div><div class="stat-label">' + l + "</div></div>";
+    }
+    function renderStats(s) {
+      if (!s || s.trips_planned === 0) return;
+      statsBar.style.display = "grid";
+      statsBar.innerHTML =
+        statTile(s.confirmed, "Confirmed trips") + statTile(s.cancelled, "Cancelled") +
+        statTile(inr(s.total_spent), "Total spend") + statTile(s.cities.length, "Cities");
+    }
+
+    function mapUrl(lat, lon) {
+      var d = 0.15;
+      return "https://www.openstreetmap.org/export/embed.html?bbox=" +
+        (lon - d) + "%2C" + (lat - d) + "%2C" + (lon + d) + "%2C" + (lat + d) +
+        "&layer=mapnik&marker=" + lat + "%2C" + lon;
+    }
+
+    function tripCardHtml(b) {
+      var it = b.itinerary || {};
+      var statusClass = b.status === "confirmed" ? "status confirmed" : "status";
+      var days = (it.days && it.days.length)
+        ? '<ul class="day-list">' + it.days.map(function (d, i) {
+            return "<li><span>Day " + (i + 1) + "</span>" + d + "</li>"; }).join("") + "</ul>"
+        : "";
+      var mapBlock = (it.lat != null && it.lon != null)
+        ? '<div class="map-wrap" id="map-' + b.id + '" style="display:none">' +
+          '<iframe title="map" loading="lazy" src="' + mapUrl(it.lat, it.lon) + '"></iframe></div>'
+        : "";
+      var actions =
+        '<button class="link-btn pdf-btn" data-id="' + b.id + '">⤓ PDF</button>' +
+        (mapBlock ? '<button class="link-btn map-btn" data-id="' + b.id + '">◎ Map</button>' : "") +
+        (b.status === "confirmed"
+          ? '<button class="link-btn cancel-btn" data-id="' + b.id + '">Cancel trip</button>' : "");
+      return (
+        '<div class="trip-card">' +
+          '<div class="top"><span class="airline">' + (it.airline || "\u2014") + "</span>" +
+            '<span class="' + statusClass + '">' + b.status + "</span></div>" +
+          '<div class="middle"><div><p class="label">Destination</p>' +
+            '<p class="value">' + (it.destination || "\u2014") + "</p></div>" +
+            '<div class="stub-divider"></div>' +
+            '<div style="text-align:right"><p class="label">Departs</p>' +
+            '<p class="value">' + (it.departure_date || "\u2014") + "</p></div></div>" +
+          days + mapBlock +
+          '<div class="bottom"><span>' + (it.nights || 0) + " nights &middot; " +
+            (it.hotel_name || "") + "</span>" +
+            '<span class="price">' + inr(b.total_price) + "</span></div>" +
+          '<div class="card-actions">' + actions + "</div>" +
+        "</div>"
+      );
+    }
+
+    function downloadPdf(id, btn) {
+      var old = btn.textContent; btn.disabled = true; btn.textContent = "…";
+      fetch(API_URL + "/bookings/" + id + "/pdf", { headers: { Authorization: "Bearer " + getToken() } })
+        .then(function (r) { if (!r.ok) throw new Error("PDF failed"); return r.blob(); })
+        .then(function (blob) {
+          var u = URL.createObjectURL(blob);
+          var a = document.createElement("a"); a.href = u; a.download = "tripmind_trip_" + id + ".pdf";
+          document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(u);
+        })
+        .catch(function (e) { alert(e.message); })
+        .finally(function () { btn.disabled = false; btn.textContent = old; });
+    }
+
+    function bindActions() {
+      document.querySelectorAll(".pdf-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () { downloadPdf(btn.getAttribute("data-id"), btn); });
+      });
+      document.querySelectorAll(".map-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var m = document.getElementById("map-" + btn.getAttribute("data-id"));
+          m.style.display = m.style.display === "none" ? "block" : "none";
+        });
+      });
+      document.querySelectorAll(".cancel-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          btn.disabled = true; btn.textContent = "Cancelling...";
+          api.cancelBooking(btn.getAttribute("data-id")).then(load).catch(function (err) {
+            btn.disabled = false; btn.textContent = "Cancel trip"; alert(err.message);
+          });
+        });
+      });
+    }
+
+    function load() {
+      Promise.all([api.listBookings(), api.getStats().catch(function () { return null; })])
+        .then(function (r) {
+          var bookings = r[0]; renderStats(r[1]);
+          if (bookings.length === 0) {
+            contentEl.innerHTML =
+              '<div class="empty-state"><p>No trips yet. Head to Plan a trip and tell TripMind what you\'re after.</p></div>';
+            return;
+          }
+          contentEl.innerHTML = bookings.map(tripCardHtml).join("");
+          bindActions();
+        })
+        .catch(function (err) {
+          contentEl.innerHTML = '<p class="error-text">Could not load trips: ' + err.message + "</p>";
+        });
+    }
+    load();
+  </script>
+</body>
+</html>

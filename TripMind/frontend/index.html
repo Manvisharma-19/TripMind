@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>TripMind</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="auth-wrap"><p class="loading-text">Loading TripMind...</p></div>
+  <script src="api.js"></script>
+  <script>
+    window.location.href = isLoggedIn() ? "chat.html" : "landing.html";
+  </script>
+</body>
+</html>

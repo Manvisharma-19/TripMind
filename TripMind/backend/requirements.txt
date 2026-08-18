@@ -1,0 +1,19 @@
+# TripMind backend — matched to what the code actually imports.
+#
+# Removed from the original list (they caused the install failures on Python
+# 3.14 and aren't used by the working app):
+#   langchain, langchain-openai, langgraph  -> the planner needs none of them
+#   passlib[bcrypt]                          -> auth.py uses `bcrypt` directly
+#
+# IMPORTANT: use Python 3.12 (see README). On 3.14 several of these still lack
+# prebuilt wheels and pip tries to compile them, which fails on most machines.
+
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.6
+sqlalchemy>=2.0.35
+pydantic[email]>=2.10.0
+python-jose[cryptography]>=3.3.0
+bcrypt>=4.1.2
+python-dotenv>=1.0.1
+python-multipart>=0.0.9
+fpdf2>=2.7.9

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TripMind — Plan trips by just describing them</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="landing.css" />
+</head>
+<body>
+  <!-- NAV -->
+  <header class="lp-nav">
+    <div class="brand">Trip<span>Mind</span></div>
+    <div class="lp-nav-actions">
+      <button class="btn-ghost" onclick="location.href='login.html'">Log in</button>
+      <button class="btn-fill" onclick="location.href='register.html'">Sign up free</button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="sky-plane">✈️</div>
+    <p class="eyebrow reveal">Your AI travel planner</p>
+    <h1 class="reveal d1">Describe your dream trip.<br /><span class="hl">We plan every detail.</span></h1>
+    <p class="lead reveal d2">
+      Tell TripMind a vibe, a budget and where you're flying from — beaches, mountains,
+      monuments, whatever you're after. Get flights, hotels and a day-by-day itinerary in seconds.
+    </p>
+    <div class="hero-cta reveal d3">
+      <button class="btn-fill" onclick="location.href='register.html'">Start planning →</button>
+      <button class="btn-ghost" onclick="location.href='login.html'">I already have an account</button>
+    </div>
+
+    <!-- ANIMATED SCENES -->
+    <div class="scenes">
+      <!-- BEACH -->
+      <div class="scene reveal d1">
+        <svg viewBox="0 0 300 220" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="beachGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#8fd3e8"/><stop offset="1" stop-color="#d9f2f5"/>
+            </linearGradient>
+          </defs>
+          <rect fill="url(#beachGrad)" width="300" height="220"/>
+          <circle class="sun" cx="235" cy="55" r="26" fill="#ffd36b"/>
+          <rect y="150" width="300" height="70" fill="#f4e3b8"/>
+          <path class="wave" d="M0,150 q30,-12 60,0 t60,0 t60,0 t60,0 t60,0 v20 H0 Z" fill="#48b3d0"/>
+          <path class="wave2" d="M0,162 q30,-10 60,0 t60,0 t60,0 t60,0 t60,0 v20 H0 Z" fill="#2f97b8" opacity=".8"/>
+          <g class="palm">
+            <rect x="146" y="120" width="8" height="72" rx="4" fill="#8a5a2b"/>
+            <path d="M150,120 q-40,-18 -60,-6 q30,-4 58,10 Z" fill="#2fa36b"/>
+            <path d="M150,120 q40,-18 60,-6 q-30,-4 -58,10 Z" fill="#28925f"/>
+            <path d="M150,120 q-16,-40 -6,-58 q10,28 8,58 Z" fill="#34ad72"/>
+            <path d="M150,120 q16,-38 34,-40 q-22,14 -30,44 Z" fill="#2fa36b"/>
+          </g>
+          <span></span>
+        </svg>
+        <div class="label">🏖️ Beaches</div>
+      </div>
+
+      <!-- MOUNTAINS -->
+      <div class="scene reveal d2">
+        <svg viewBox="0 0 300 220" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="mtnGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#bcd6ef"/><stop offset="1" stop-color="#eef5fb"/>
+            </linearGradient>
+          </defs>
+          <rect fill="url(#mtnGrad)" width="300" height="220"/>
+          <circle cx="60" cy="52" r="20" fill="#fff4cf"/>
+          <g class="cloud-m"><ellipse cx="210" cy="46" rx="34" ry="14" fill="#ffffff" opacity=".9"/></g>
+          <path d="M-10,200 L70,90 L130,200 Z" fill="#6d86a6"/>
+          <path d="M70,90 L92,120 L48,120 Z" fill="#ffffff"/>
+          <path d="M90,200 L180,70 L270,200 Z" fill="#546c8c"/>
+          <path d="M180,70 L205,108 L155,108 Z" fill="#ffffff"/>
+          <path d="M210,200 L300,110 L360,200 Z" fill="#41597a"/>
+          <rect y="196" width="300" height="26" fill="#3a5170"/>
+          <circle class="snowflake" cx="40"  cy="0" r="2.5" fill="#fff" style="animation-duration:6s; animation-delay:0s"/>
+          <circle class="snowflake" cx="110" cy="0" r="2" fill="#fff" style="animation-duration:8s; animation-delay:1s"/>
+          <circle class="snowflake" cx="175" cy="0" r="2.5" fill="#fff" style="animation-duration:5.5s; animation-delay:.5s"/>
+          <circle class="snowflake" cx="240" cy="0" r="2" fill="#fff" style="animation-duration:7s; animation-delay:2s"/>
+          <circle class="snowflake" cx="285" cy="0" r="2.5" fill="#fff" style="animation-duration:6.5s; animation-delay:1.5s"/>
+        </svg>
+        <div class="label">🏔️ Mountains</div>
+      </div>
+
+      <!-- MONUMENT -->
+      <div class="scene reveal d3">
+        <svg viewBox="0 0 300 220" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="monGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#f6c89a"/><stop offset="1" stop-color="#fbe9d5"/>
+            </linearGradient>
+          </defs>
+          <rect fill="url(#monGrad)" width="300" height="220"/>
+          <circle cx="150" cy="60" r="30" fill="#ffe0a3" opacity=".8"/>
+          <g class="cloud-a"><ellipse cx="70" cy="42" rx="30" ry="12" fill="#fff" opacity=".85"/></g>
+          <g class="cloud-b"><ellipse cx="235" cy="66" rx="26" ry="10" fill="#fff" opacity=".8"/></g>
+          <g class="bird" style="animation-delay:0s"><path d="M60,40 q6,-6 12,0 q6,-6 12,0" stroke="#5c7290" stroke-width="2" fill="none"/></g>
+          <!-- stylised domed palace -->
+          <rect y="180" width="300" height="40" fill="#caa877"/>
+          <rect x="120" y="120" width="60" height="62" fill="#fff7ee"/>
+          <path d="M120,120 q30,-46 60,0 Z" fill="#fbeede"/>
+          <circle cx="150" cy="96" r="8" fill="#e6b877"/>
+          <rect x="146" y="80" width="8" height="14" fill="#e6b877"/>
+          <rect x="96"  y="140" width="16" height="42" fill="#fff2e2"/>
+          <path d="M96,140 q8,-20 16,0 Z" fill="#f2ddc4"/>
+          <rect x="188" y="140" width="16" height="42" fill="#fff2e2"/>
+          <path d="M188,140 q8,-20 16,0 Z" fill="#f2ddc4"/>
+          <rect x="140" y="150" width="20" height="32" rx="10" fill="#b98a55"/>
+        </svg>
+        <div class="label">🕌 Monuments</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOARDING PASS -->
+  <section class="section" style="margin-top:56px">
+    <div class="ticket reveal">
+      <div class="stub">
+        <div style="font-size:11px;letter-spacing:.15em;text-transform:uppercase;opacity:.7">Boarding</div>
+        <div class="big">TM · 01</div>
+      </div>
+      <div class="body">
+        <div class="cell"><div class="k">From</div><div class="v">Delhi</div></div>
+        <div class="cell" style="font-size:22px;color:#f2a65a">✈</div>
+        <div class="cell"><div class="k">To</div><div class="v">Goa</div></div>
+        <div class="cell"><div class="k">Nights</div><div class="v">4</div></div>
+        <div class="cell"><div class="k">Total</div><div class="v">₹24,900</div></div>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:16px">Every plan comes as a ready-to-download boarding-pass itinerary.</p>
+  </section>
+
+  <!-- DESTINATIONS -->
+  <section class="section">
+    <h2>Popular escapes</h2>
+    <p class="sub">A taste of where TripMind can send you.</p>
+    <div class="cards">
+      <div class="pcard pc-goa"><span class="emoji">🏖️</span><span class="meta">Goa</span></div>
+      <div class="pcard pc-manali"><span class="emoji">🏔️</span><span class="meta">Manali</span></div>
+      <div class="pcard pc-jaipur"><span class="emoji">🏰</span><span class="meta">Jaipur</span></div>
+      <div class="pcard pc-bali"><span class="emoji">🌴</span><span class="meta">Bali</span></div>
+      <div class="pcard pc-kochi"><span class="emoji">🛶</span><span class="meta">Kochi</span></div>
+      <div class="pcard pc-udaipur"><span class="emoji">🏙️</span><span class="meta">Udaipur</span></div>
+      <div class="pcard pc-andaman"><span class="emoji">🐠</span><span class="meta">Andaman</span></div>
+      <div class="pcard pc-pondi"><span class="emoji">☕</span><span class="meta">Pondicherry</span></div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section">
+    <h2>How it works</h2>
+    <p class="sub">Three steps from idea to itinerary.</p>
+    <div class="steps">
+      <div class="step"><div class="num">1</div><h3>Describe it</h3><p>“Somewhere warm in December, under ₹30,000, 5 days, from Delhi.”</p></div>
+      <div class="step"><div class="num">2</div><h3>Get a plan</h3><p>TripMind picks a destination, flight and hotel within budget, plus a day-by-day plan.</p></div>
+      <div class="step"><div class="num">3</div><h3>Refine &amp; save</h3><p>Say “make it cheaper” or “try mountains instead”, then download your itinerary.</p></div>
+    </div>
+  </section>
+
+  <!-- FOOTER CTA -->
+  <section class="foot-cta">
+    <h2>Ready to plan your next trip?</h2>
+    <p>It takes about ten seconds to create an account.</p>
+    <button class="btn-fill" onclick="location.href='register.html'">Get started free →</button>
+  </section>
+  <div class="lp-footer">© TripMind — a final-year project.</div>
+
+  <script src="api.js"></script>
+  <script>
+    // If already logged in, skip the landing page and go straight to planning.
+    if (typeof isLoggedIn === "function" && isLoggedIn()) {
+      window.location.href = "chat.html";
+    }
+  </script>
+</body>
+</html>

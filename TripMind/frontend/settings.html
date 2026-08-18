@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Settings — TripMind</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="navbar">
+    <a href="chat.html" class="brand">TripMind</a>
+    <nav>
+      <a href="chat.html">Plan a trip</a>
+      <a href="trips.html">My trips</a>
+      <a href="settings.html" class="active">Settings</a>
+      <button id="logoutBtn">Log out</button>
+    </nav>
+  </header>
+
+  <main class="auth-wrap" style="align-items:flex-start;padding-top:48px">
+    <div class="auth-box">
+      <div class="auth-card">
+        <h2 class="display">Your preferences</h2>
+        <p class="subtitle">TripMind uses these to plan smarter for you.</p>
+
+        <p class="error-text" id="msg" style="display:none"></p>
+
+        <div class="field">
+          <label for="homeCity">Home city (default departure)</label>
+          <select id="homeCity">
+            <option value="">No preference</option>
+            <option>Delhi</option>
+            <option>Mumbai</option>
+            <option>Bangalore</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="budgetStyle">Budget style</label>
+          <select id="budgetStyle">
+            <option value="budget">Budget — cheapest options</option>
+            <option value="balanced" selected>Balanced — good value</option>
+            <option value="comfort">Comfort — nicer hotels</option>
+          </select>
+        </div>
+
+        <button class="btn-primary" id="saveBtn">Save preferences</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="api.js"></script>
+  <script>
+    requireAuth();
+    document.getElementById("logoutBtn").addEventListener("click", function () {
+      clearToken(); window.location.href = "login.html";
+    });
+
+    const homeCity = document.getElementById("homeCity");
+    const budgetStyle = document.getElementById("budgetStyle");
+    const msg = document.getElementById("msg");
+    const saveBtn = document.getElementById("saveBtn");
+
+    // Load current preferences.
+    api.me().then(function (u) {
+      const p = u.preferences || {};
+      if (p.home_city) homeCity.value = p.home_city;
+      if (p.budget_style) budgetStyle.value = p.budget_style;
+    }).catch(function(){});
+
+    saveBtn.addEventListener("click", function () {
+      saveBtn.disabled = true; saveBtn.textContent = "Saving...";
+      api.updatePreferences({ home_city: homeCity.value, budget_style: budgetStyle.value })
+        .then(function () {
+          msg.textContent = "Saved! TripMind will use these next time you plan.";
+          msg.style.color = "#128a5a"; msg.style.display = "block";
+        })
+        .catch(function (err) {
+          msg.textContent = err.message; msg.style.color = "#dc2626"; msg.style.display = "block";
+        })
+        .finally(function () { saveBtn.disabled = false; saveBtn.textContent = "Save preferences"; });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Create account - TripMind</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="auth-wrap">
+    <div class="auth-box">
+      <div class="auth-eyebrow">
+        <p>Boarding pass to</p>
+        <h1 class="display">TripMind</h1>
+      </div>
+
+      <div class="auth-card">
+        <h2 class="display">Create your account</h2>
+        <p class="subtitle">Takes about ten seconds.</p>
+
+        <p class="error-text" id="errorText" style="display: none"></p>
+
+        <form id="registerForm">
+          <div class="field">
+            <label for="name">Name</label>
+            <input type="text" id="name" required placeholder="Selu" />
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input type="email" id="email" required placeholder="you@example.com" />
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <input type="password" id="password" required minlength="6" placeholder="At least 6 characters" />
+          </div>
+          <button type="submit" class="btn-primary" id="submitBtn">Create account</button>
+        </form>
+      </div>
+
+      <p class="auth-footer">
+        Already have an account? <a href="login.html">Log in</a>
+      </p>
+    </div>
+  </main>
+
+  <script src="api.js"></script>
+  <script>
+    redirectIfLoggedIn();
+
+    const form = document.getElementById("registerForm");
+    const errorText = document.getElementById("errorText");
+    const submitBtn = document.getElementById("submitBtn");
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      errorText.style.display = "none";
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Creating account...";
+
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const result = await api.register(email, password, name);
+        setToken(result.access_token);
+        window.location.href = "chat.html";
+      } catch (err) {
+        errorText.textContent = err.message || "Registration failed";
+        errorText.style.display = "block";
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Create account";
+      }
+    });
+  </script>
+</body>
+</html>
